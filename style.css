@@ -1,0 +1,20 @@
+:root {
+  --shadow: rgba(255,255,255,1);
+}
+.reveal ul {
+  list-style-type: '— ';
+}
+.reveal ul, .reveal ol {
+  padding-left: 1.5em;
+}
+.reveal h1 {
+  text-shadow: 0 0 0.2em var(--shadow), 0 0 0.2em var(--shadow), 0 0 0.2em var(--shadow), 0 0 0.2em var(--shadow);
+}
+section > p, section > ul, section > ol {
+  background: rgba(255,255,255,0.5);
+  box-shadow: 0 0 0.2em #fff;
+  padding: 0 1em;
+}
+.reveal table td {
+  border-bottom: none;
+}
