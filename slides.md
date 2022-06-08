@@ -10,7 +10,7 @@
 
 # What is data validation?
 
-## Detect good data
+## Detect bad data
 
 ::: incremental
 
@@ -20,8 +20,6 @@
 
 - **Data validation** $=$ check expectations
 
-- Data validation $\neq$ Information validation
-
 :::
 
 ## Expectations
@@ -29,8 +27,7 @@
 ::: incremental
 
 - **completeness**\
-   *internal*: e.g. all authors have names\
-   *external*: e.g. all authors are listed
+  e.g. all records have year 
 
 - **constraints**\
   e.g. year < 2022
@@ -40,18 +37,21 @@
 
 :::
 
+## Data $\neq$ Information
+
+- **completeness**
+
+    - *internal*: e.g. all authors have names
+
+    - *external*: e.g. all authors are listed
+
 ## Data quality
 
-::: incremental
+- code: **unit tests** \
+  against software rot
 
-- code $\Rightarrow$ **unit tests**
-
-- data $\Rightarrow$ **data validation**
-
-- **Violations accumulate**\
-  if expectations are not enforced
-
-:::
+- data: **data validation** \
+  against propagation of errors
 
 # Why is data validation difficult?
 
@@ -88,26 +88,38 @@
 
 ## Levels of description
 
-~~~{.graphviz}
+~~~{.graphviz filename=levels}
 digraph {
+  node [fontname="sans-serif"];
   Bytes -> XML;
+  { rank=same; sequence -> Bytes[style=invis]; sequence[shape=plaintext] }
   XML -> marcxml;
+  { rank=same; tree -> XML[style=invis]; tree[shape=plaintext] }
+  { rank=same;
+    XML -> parser [dir=back,arrowtail=vee]
+    parser[shape=plaintext]
+  }
   marcxml[label="MARC/XML"];
+  { rank=same;
+    marcxml -> schema [dir=back,arrowtail=vee]
+    schema[shape=plaintext]
+  }
   marcxml -> MARC;
+  { rank=same; fields -> MARC[style=invis]; fields[shape=plaintext] }
   MARC -> Custom;
   Custom[label="MARC21 Subset"]
+  { rank=same;
+    Custom -> rules [dir=back,arrowtail=vee]
+    rules[shape=plaintext]
+  }
 }
 ~~~
-
-<!--
-             XML Schema            Avram Schema
--->
 
 # How to make data validation easy
 
 ## Abstraction
 
-~~~{.graphviz width=200%}
+~~~{.graphviz width=200% filename=abstraction}
 digraph {
   rankdir="LR";
   node [shape=box, style=rounded, fontname="sans-serif"]
@@ -124,14 +136,14 @@ digraph {
 ## API
 
 Request
-  : data (file, URL, file or stream) and\
-    format identifier (+ optional version)
+  : `data` (file, URL, file or stream) and\
+    `format` identifier (+ optional version)
 
 Response
   : list of errors
 
 Error
-  : message (+ optional position)
+  : `message` (+ optional positions)
 
 # Where can I use it?
 
@@ -147,6 +159,8 @@ Error
 
 ## Request API
 
+::: incremental
+
 - HTTP GET & POST
   - raw data or web form file upload
   - Use in any web application (CORS)
@@ -155,17 +169,18 @@ Error
 
 - Command line (requires configuration)
 
+:::
+
 ## Demo
 
-...
+<https://format.gbv.de/validate>
 
-## Request example
+## Example
 
-`POST https://format.gbv.de/validate/{format}`
-
-`curl https://format.gbv.de/validate/vzg-article --data-binary @article.json`
-
-## Response Format
+~~~shell
+curl https://format.gbv.de/validate/vzg-article \
+  --data-binary @article.json
+~~~
 
 ~~~json
 [ 
@@ -181,9 +196,10 @@ Error
 ## Benefits
 
 - Registry of known formats and schemas
+
 - No local installation required
-- Unified request format
-- Unified error format
+
+- Unified API
 
 # Summary & Outlook
 
@@ -201,7 +217,7 @@ Error
 
 ## Abstraction
 
-~~~{.graphviz width=200%}
+~~~{.graphviz width=200% filename=summary}
 digraph {
   rankdir="LR";
   node [shape=box, style=rounded, fontname="sans-serif"]
@@ -224,7 +240,8 @@ digraph {
 
 ## Planned features
 
-- Support more schema languages (Avram, EBNF, Schematron SHACL/ShEx)
+- Support more schema languages\
+  (Avram, EBNF, Schematron SHACL/ShEx...)
 
 - Support validating MARC21
 
@@ -232,7 +249,7 @@ digraph {
 
 ## Alternatives
 
-- Build-in rules of black-box library system 😕
+- Build-in rules of black-box library system 😕 
 
 - Validator engines for each schema language (e.g. `xmllint`) 😐
 

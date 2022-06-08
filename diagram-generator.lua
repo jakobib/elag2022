@@ -344,7 +344,8 @@ function CodeBlock(block)
   -- the image data.
 
   -- Create figure name by hashing the image content
-  local fname = pandoc.sha1(img) .. "." .. filetype
+  local filename = block.attributes.filename or pandoc.sha1(img)
+  local fname = filename .. "." .. filetype
 
   -- Store the data in the media bag:
   pandoc.mediabag.insert(fname, mimetype, img)
@@ -372,6 +373,7 @@ function CodeBlock(block)
     id = block.identifier,
     name = block.attributes.name,
     width = block.attributes.width,
+    height = block.attributes.height,
   }
 
   -- Create a new image for the document's structure. Attach the user's
